@@ -73,6 +73,7 @@ static const char rcsid[] _U_ =
  */
 
 
+#include <stdlib.h>
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -89,7 +90,6 @@ static const char rcsid[] _U_ =
 #endif /* HAVE_SEPTEL_API */
 	  
 #include <errno.h>
-#include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
