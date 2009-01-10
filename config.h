@@ -139,7 +139,7 @@
 #define HAVE___ATTRIBUTE__ 1
 
 /* IPv6 */
-/* #undef INET6 */
+#define INET6
 
 /* if unaligned access fails */
 /* #undef LBL_ALIGN */
