@@ -77,6 +77,9 @@
 /* Define to 1 if you have the <linux/ethtool.h> header file. */
 #define HAVE_LINUX_ETHTOOL_H 1
 
+/* Define to 1 if you have the <linux/if_bonding.h> header file. */
+#define HAVE_LINUX_IF_BONDING_H 1
+
 /* Define to 1 if you have the <linux/if_packet.h> header file. */
 #define HAVE_LINUX_IF_PACKET_H 1
 
