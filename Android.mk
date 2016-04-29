@@ -3,6 +3,7 @@ LOCAL_PATH:= $(call my-dir)
 libpcap_cflags := \
   -Wno-unused-parameter \
   -D_U_="__attribute__((unused))" \
+  -Werror \
 
 include $(CLEAR_VARS)
 
