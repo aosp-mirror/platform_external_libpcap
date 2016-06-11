@@ -2,6 +2,7 @@ LOCAL_PATH:= $(call my-dir)
 
 libpcap_cflags := \
   -Wno-unused-parameter \
+  -D_BSD_SOURCE \
   -D_U_="__attribute__((unused))" \
   -Werror \
 
