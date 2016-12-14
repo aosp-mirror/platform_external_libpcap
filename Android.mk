@@ -9,7 +9,7 @@ libpcap_cflags := \
 include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := \
-  pcap-linux.c pcap-usb-linux.c pcap-can-linux.c pcap-netfilter-linux.c pcap-netfilter-linux-android.c \
+  pcap-linux.c pcap-usb-linux.c pcap-can-linux.c pcap-netfilter-linux-android.c \
   fad-gifc.c \
   pcap.c inet.c gencode.c optimize.c nametoaddr.c etherent.c \
   savefile.c sf-pcap.c sf-pcap-ng.c pcap-common.c \
@@ -30,6 +30,13 @@ LOCAL_EXPORT_C_INCLUDE_DIRS := $(LOCAL_PATH)
 LOCAL_MODULE:= libpcap
 
 include $(BUILD_STATIC_LIBRARY)
+
+include $(CLEAR_VARS)
+
+LOCAL_WHOLE_STATIC_LIBRARIES := libpcap
+LOCAL_MODULE := libpcap
+
+include $(BUILD_SHARED_LIBRARY)
 
 libpcap_tests :=  \
   tests/capturetest.c \
