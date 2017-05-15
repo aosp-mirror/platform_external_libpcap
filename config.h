@@ -1,5 +1,5 @@
 /* config.h.  Generated from config.h.in by configure.  */
-/* config.h.in.  Generated from configure.in by autoheader.  */
+/* config.h.in.  Generated from configure.ac by autoheader.  */
 
 /* Enable optimizer debugging */
 /* #undef BDEBUG */
@@ -24,7 +24,7 @@
 
 /* Define to 1 if you have the declaration of `ether_hostton', and to 0 if you
    don't. */
-/* #undef HAVE_DECL_ETHER_HOSTTON */
+#define HAVE_DECL_ETHER_HOSTTON 1
 
 /* define if you have a /dev/dlpi */
 /* #undef HAVE_DEV_DLPI */
@@ -86,6 +86,9 @@
 /* Define to 1 if you have the <linux/net_tstamp.h> header file. */
 #define HAVE_LINUX_NET_TSTAMP_H 1
 
+/* Define to 1 if you have the <linux/sockios.h> header file. */
+#define HAVE_LINUX_SOCKIOS_H 1
+
 /* if tp_vlan_tci exists */
 #define HAVE_LINUX_TPACKET_AUXDATA_TP_VLAN_TCI 1
 
@@ -122,16 +125,13 @@
 /* if there's an os_proto.h for this platform, to use additional prototypes */
 /* #undef HAVE_OS_PROTO_H */
 
-/* Define to 1 if you have the <paths.h> header file. */
-#define HAVE_PATHS_H 1
-
 /* define if net/pfvar.h defines PF_NAT through PF_NORDR */
 /* #undef HAVE_PF_NAT_THROUGH_PF_NORDR */
 
-/* define if you have a Septel API */
+/* define if you have the Septel API */
 /* #undef HAVE_SEPTEL_API */
 
-/* define if you have Myricom SNF API */
+/* define if you have the Myricom SNF API */
 /* #undef HAVE_SNF_API */
 
 /* Define to 1 if you have the `snprintf' function. */
@@ -165,7 +165,10 @@
 #define HAVE_STRING_H 1
 
 /* Define to 1 if you have the `strlcpy' function. */
-#define HAVE_STRLCPY 1
+/* #undef HAVE_STRLCPY */
+
+/* Define to 1 if you have the `strtok_r' function. */
+#define HAVE_STRTOK_R 1
 
 /* Define to 1 if the system has the type `struct BPF_TIMEVAL'. */
 /* #undef HAVE_STRUCT_BPF_TIMEVAL */
@@ -185,6 +188,9 @@
 /* Define to 1 if you have the <sys/ioccom.h> header file. */
 /* #undef HAVE_SYS_IOCCOM_H */
 
+/* Define to 1 if you have the <sys/select.h> header file. */
+#define HAVE_SYS_SELECT_H 1
+
 /* Define to 1 if you have the <sys/sockio.h> header file. */
 /* #undef HAVE_SYS_SOCKIO_H */
 
@@ -194,6 +200,9 @@
 /* Define to 1 if you have the <sys/types.h> header file. */
 #define HAVE_SYS_TYPES_H 1
 
+/* define if you have the TurboCap API */
+/* #undef HAVE_TC_API */
+
 /* if if_packet.h has tpacket_stats defined */
 #define HAVE_TPACKET_STATS 1
 
@@ -202,9 +211,6 @@
 
 /* if struct usbdevfs_ctrltransfer has bRequestType */
 #define HAVE_USBDEVFS_CTRLTRANSFER_BREQUESTTYPE 1
-
-/* define if version.h is generated in the build procedure */
-#define HAVE_VERSION_H 1
 
 /* Define to 1 if you have the `vsnprintf' function. */
 #define HAVE_VSNPRINTF 1
@@ -224,11 +230,8 @@
 /* path for device for USB sniffing */
 #define LINUX_USB_MON_DEV "/dev/usbmon"
 
-/* if we need a pcap_parse wrapper around yyparse */
-/* #undef NEED_YYPARSE_WRAPPER */
-
 /* Define to 1 if netinet/ether.h declares `ether_hostton' */
-/* #undef NETINET_ETHER_H_DECLARES_ETHER_HOSTTON */
+#define NETINET_ETHER_H_DECLARES_ETHER_HOSTTON /**/
 
 /* Define to 1 if netinet/if_ether.h declares `ether_hostton' */
 /* #undef NETINET_IF_ETHER_H_DECLARES_ETHER_HOSTTON */
@@ -260,17 +263,17 @@
 /* target host supports Bluetooth sniffing */
 /* #undef PCAP_SUPPORT_BT */
 
-/* target host supports CAN sniffing */
-#define PCAP_SUPPORT_CAN 1
-
-/* target host supports canusb */
-/* #undef PCAP_SUPPORT_CANUSB */
+/* target host supports Bluetooth Monitor */
+/* #undef PCAP_SUPPORT_BT_MONITOR */
 
 /* support D-Bus sniffing */
 /* #undef PCAP_SUPPORT_DBUS */
 
 /* target host supports netfilter sniffing */
 #define PCAP_SUPPORT_NETFILTER 1
+
+/* use Linux packet ring capture if available */
+#define PCAP_SUPPORT_PACKET_RING 1
 
 /* target host supports USB sniffing */
 #define PCAP_SUPPORT_USB 1
@@ -286,6 +289,10 @@
 
 /* Enable parser debugging */
 /* #undef YYDEBUG */
+
+/* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a
+   `char[]'. */
+#define YYTEXT_POINTER 1
 
 /* Enable large inode numbers on Mac OS X 10.5.  */
 #ifndef _DARWIN_USE_64_BIT_INODE
