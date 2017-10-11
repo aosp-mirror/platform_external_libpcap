@@ -33,6 +33,7 @@ include $(CLEAR_VARS)
 
 LOCAL_WHOLE_STATIC_LIBRARIES := libpcap
 LOCAL_MODULE := libpcap
+LOCAL_CFLAGS := -Wall -Werror
 
 include $(BUILD_SHARED_LIBRARY)
 
