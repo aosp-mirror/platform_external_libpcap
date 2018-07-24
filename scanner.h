@@ -3,15 +3,34 @@
 #define pcap_IN_HEADER 1
 
 #line 6 "scanner.h"
-#line 2 "scanner.l"
 /* Must come first for _LARGE_FILE_API on AIX. */
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
+/*
+ * Must come first to avoid warnings on Windows.
+ *
+ * Flex-generated scanners may only include <inttypes.h> if __STDC_VERSION__
+ * is defined with a value >= 199901, meaning "full C99", and MSVC may not
+ * define it with that value, because it isn't 100% C99-compliant, even
+ * though it has an <inttypes.h> capable of defining everything the Flex
+ * scanner needs.
+ *
+ * We, however, will include it if we know we have an MSVC version that has
+ * it; this means that we may define the INTn_MAX and UINTn_MAX values in
+ * scanner.c, and then include <stdint.h>, which may define them differently
+ * (same value, but different string of characters), causing compiler warnings.
+ *
+ * If we include it here, and they're defined, that'll prevent scanner.c
+ * from defining them.  So we include <pcap/pcap-inttypes.h>, to get
+ * <inttypes.h> if we have it.
+ */
+#include <pcap/pcap-inttypes.h>
 
+#include "diag-control.h"
 
-#line 15 "scanner.h"
+#line 34 "scanner.h"
 
 #define  YY_INT_ALIGNED short int
 
@@ -19,8 +38,8 @@
 
 #define FLEX_SCANNER
 #define YY_FLEX_MAJOR_VERSION 2
-#define YY_FLEX_MINOR_VERSION 5
-#define YY_FLEX_SUBMINOR_VERSION 39
+#define YY_FLEX_MINOR_VERSION 6
+#define YY_FLEX_SUBMINOR_VERSION 1
 #if YY_FLEX_SUBMINOR_VERSION > 0
 #define FLEX_BETA
 #endif
@@ -99,25 +118,13 @@ typedef unsigned int flex_uint32_t;
 
 #endif /* ! FLEXINT_H */
 
-#ifdef __cplusplus
-
-/* The "const" storage-class-modifier is valid. */
-#define YY_USE_CONST
-
-#else	/* ! __cplusplus */
-
-/* C99 requires __STDC__ to be defined as 1. */
-#if defined (__STDC__)
-
-#define YY_USE_CONST
-
-#endif	/* defined (__STDC__) */
-#endif	/* ! __cplusplus */
-
-#ifdef YY_USE_CONST
+/* TODO: this is always defined, so inline it */
 #define yyconst const
+
+#if defined(__GNUC__) && __GNUC__ >= 3
+#define yynoreturn __attribute__((__noreturn__))
 #else
-#define yyconst
+#define yynoreturn
 #endif
 
 /* An opaque pointer. */
@@ -172,12 +179,12 @@ struct yy_buffer_state
 	/* Size of input buffer in bytes, not including room for EOB
 	 * characters.
 	 */
-	yy_size_t yy_buf_size;
+	int yy_buf_size;
 
 	/* Number of characters read into yy_ch_buf, not including EOB
 	 * characters.
 	 */
-	yy_size_t yy_n_chars;
+	int yy_n_chars;
 
 	/* Whether we "own" the buffer - i.e., we know we created it,
 	 * and can realloc() it to grow it, and should free() it to
@@ -200,7 +207,7 @@ struct yy_buffer_state
 
     int yy_bs_lineno; /**< The line count. */
     int yy_bs_column; /**< The column count. */
-    
+
 	/* Whether to try to fill the input buffer when we reach the
 	 * end of it.
 	 */
@@ -221,7 +228,7 @@ void pcap_pop_buffer_state (yyscan_t yyscanner );
 
 YY_BUFFER_STATE pcap__scan_buffer (char *base,yy_size_t size ,yyscan_t yyscanner );
 YY_BUFFER_STATE pcap__scan_string (yyconst char *yy_str ,yyscan_t yyscanner );
-YY_BUFFER_STATE pcap__scan_bytes (yyconst char *bytes,yy_size_t len ,yyscan_t yyscanner );
+YY_BUFFER_STATE pcap__scan_bytes (yyconst char *bytes,int len ,yyscan_t yyscanner );
 
 void *pcap_alloc (yy_size_t ,yyscan_t yyscanner );
 void *pcap_realloc (void *,yy_size_t ,yyscan_t yyscanner );
@@ -229,7 +236,7 @@ void pcap_free (void * ,yyscan_t yyscanner );
 
 /* Begin user sect3 */
 
-#define pcap_wrap(yyscanner) 1
+#define pcap_wrap(yyscanner) (/*CONSTCOND*/1)
 #define YY_SKIP_YYWRAP
 
 #define yytext_ptr yytext_r
@@ -268,23 +275,23 @@ void pcap_set_extra (YY_EXTRA_TYPE user_defined ,yyscan_t yyscanner );
 
 FILE *pcap_get_in (yyscan_t yyscanner );
 
-void pcap_set_in  (FILE * in_str ,yyscan_t yyscanner );
+void pcap_set_in  (FILE * _in_str ,yyscan_t yyscanner );
 
 FILE *pcap_get_out (yyscan_t yyscanner );
 
-void pcap_set_out  (FILE * out_str ,yyscan_t yyscanner );
+void pcap_set_out  (FILE * _out_str ,yyscan_t yyscanner );
 
-yy_size_t pcap_get_leng (yyscan_t yyscanner );
+			int pcap_get_leng (yyscan_t yyscanner );
 
 char *pcap_get_text (yyscan_t yyscanner );
 
 int pcap_get_lineno (yyscan_t yyscanner );
 
-void pcap_set_lineno (int line_number ,yyscan_t yyscanner );
+void pcap_set_lineno (int _line_number ,yyscan_t yyscanner );
 
 int pcap_get_column  (yyscan_t yyscanner );
 
-void pcap_set_column (int column_no ,yyscan_t yyscanner );
+void pcap_set_column (int _column_no ,yyscan_t yyscanner );
 
 YYSTYPE * pcap_get_lval (yyscan_t yyscanner );
 
@@ -356,9 +363,9 @@ extern int pcap_lex \
 #undef YY_DECL
 #endif
 
-#line 443 "scanner.l"
+#line 490 "scanner.l"
 
 
-#line 363 "scanner.h"
+#line 370 "scanner.h"
 #undef pcap_IN_HEADER
 #endif /* pcap_HEADER_H */
