@@ -32,7 +32,7 @@ cc_defaults {
 
 cc_library {
     name: "libpcap",
-    host_supported: false,
+    host_supported: true,
     vendor_available: true,
     defaults: ["libpcap_defaults"],
 
@@ -58,6 +58,12 @@ cc_library {
         "scanner.c",
         "grammar.c",
     ],
+
+    target: {
+        darwin: {
+            enabled: false,
+        },
+    },
 
     export_include_dirs: ["."],
 }

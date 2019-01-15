@@ -197,7 +197,11 @@
 #define HAVE_STRLCAT 1
 
 /* Define to 1 if you have the `strlcpy' function. */
+#if defined(__ANDROID__)
 #define HAVE_STRLCPY 1
+#else
+#undef HAVE_STRLCPY
+#endif
 
 /* Define to 1 if you have the `strtok_r' function. */
 #define HAVE_STRTOK_R 1
