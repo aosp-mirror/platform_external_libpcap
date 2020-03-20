@@ -34,6 +34,11 @@ cc_library {
     name: "libpcap",
     host_supported: true,
     vendor_available: true,
+    // Build against the NDK 29 because it's used by the network stack mainline module tests, which
+    // need to support Q.
+    // TODO(b/148792341): stop hardcoding sdk_version integers in libraries all over the tree and
+    // define a min_apex_sdk_version property that all module code can use.
+    sdk_version: "29",
     defaults: ["libpcap_defaults"],
 
     // (Matches order in libpcap's Makefile.)
