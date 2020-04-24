@@ -7,13 +7,13 @@ third_party {
   }
   url {
     type: ARCHIVE
-    value: "https://github.com/the-tcpdump-group/libpcap/archive/libpcap-1.9.0.tar.gz"
+    value: "https://github.com/the-tcpdump-group/libpcap/archive/libpcap-1.9.1.tar.gz"
   }
-  version: "libcap-1.9.0"
+  version: "libcap-1.9.1"
   license_type: RESTRICTED
   last_upgrade_date {
-    year: 2018
-    month: 7
-    day: 22
+    year: 2020
+    month: 4
+    day: 23
   }
 }
