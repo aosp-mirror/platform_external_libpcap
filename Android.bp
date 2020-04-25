@@ -65,6 +65,11 @@ cc_library {
     ],
 
     target: {
+        linux: {
+            srcs: [
+                "missing/strlcpy.c",
+            ],
+        },
         darwin: {
             enabled: false,
         },
