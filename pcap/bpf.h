@@ -58,10 +58,21 @@
  * I don't have earlier versions available to check), or QNX-style
  * multiple-include protection (as per GitHub pull request #394).
  *
+ * We trust that they will define structures and macros and types in
+ * a fashion that's source-compatible and binary-compatible with our
+ * definitions.
+ *
  * We do not check for BPF_MAJOR_VERSION, as that's defined by
  * <linux/filter.h>, which is directly or indirectly included in some
  * programs that also include pcap.h, and <linux/filter.h> doesn't
- * define stuff we need.
+ * define stuff we need.  We *do* protect against <linux/filter.h>
+ * defining various macros for BPF code itself; <linux/filter.h> says
+ *
+ *	Try and keep these values and structures similar to BSD, especially
+ *	the BPF code definitions which need to match so you can share filters
+ *
+ * so we trust that it will define them in a fashion that's source-compatible
+ * and binary-compatible with our definitions.
  *
  * This also provides our own multiple-include protection.
  */
@@ -107,6 +118,8 @@ struct bpf_program {
 };
 
 #include <pcap/dlt.h>
+
+#ifndef __LINUX_FILTER_H__
 
 /*
  * The instruction encodings.
@@ -228,6 +241,8 @@ struct bpf_program {
 /*				0xf0	reserved */
 /*				0xf8	reserved */
 
+#endif /* __LINUX_FILTER_H__ */
+
 /*
  * The instruction data structure.
  */
@@ -238,15 +253,7 @@ struct bpf_insn {
 	bpf_u_int32 k;
 };
 
-/*
- * Auxiliary data, for use when interpreting a filter intended for the
- * Linux kernel when the kernel rejects the filter (requiring us to
- * run it in userland).  It contains VLAN tag information.
- */
-struct bpf_aux_data {
-	u_short vlan_tag_present;
-	u_short vlan_tag;
-};
+#ifndef __LINUX_FILTER_H__
 
 /*
  * Macros for insn array initializers.
@@ -254,9 +261,19 @@ struct bpf_aux_data {
 #define BPF_STMT(code, k) { (u_short)(code), 0, 0, k }
 #define BPF_JUMP(code, k, jt, jf) { (u_short)(code), jt, jf, k }
 
-PCAP_API int bpf_validate(const struct bpf_insn *, int);
-PCAP_API u_int bpf_filter(const struct bpf_insn *, const u_char *, u_int, u_int);
-extern u_int bpf_filter_with_aux_data(const struct bpf_insn *, const u_char *, u_int, u_int, const struct bpf_aux_data *);
+#endif /* __LINUX_FILTER_H__ */
+
+PCAP_AVAILABLE_0_4
+PCAP_API u_int	bpf_filter(const struct bpf_insn *, const u_char *, u_int, u_int);
+
+PCAP_AVAILABLE_0_6
+PCAP_API int	bpf_validate(const struct bpf_insn *f, int len);
+
+PCAP_AVAILABLE_0_4
+PCAP_API char	*bpf_image(const struct bpf_insn *, int);
+
+PCAP_AVAILABLE_0_6
+PCAP_API void	bpf_dump(const struct bpf_program *, int);
 
 /*
  * Number of scratch memory words (for BPF_LD|BPF_MEM and BPF_ST).
