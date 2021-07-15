@@ -1,8 +1,9 @@
-/* A Bison parser, made by GNU Bison 3.0.4.  */
+/* A Bison parser, made by GNU Bison 3.5.1.  */
 
 /* Bison interface for Yacc-like parsers in C
 
-   Copyright (C) 1984, 1989-1990, 2000-2015 Free Software Foundation, Inc.
+   Copyright (C) 1984, 1989-1990, 2000-2015, 2018-2020 Free Software Foundation,
+   Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -29,6 +30,9 @@
 
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
+
+/* Undocumented macros, especially those whose name start with YY_,
+   are private implementation details.  Do not rely on them.  */
 
 #ifndef YY_PCAP_GRAMMAR_H_INCLUDED
 # define YY_PCAP_GRAMMAR_H_INCLUDED
@@ -161,9 +165,10 @@ extern int pcap_debug;
     HOPC = 371,
     HDPC = 372,
     HSLS = 373,
-    OR = 374,
-    AND = 375,
-    UMINUS = 376
+    LEX_ERROR = 374,
+    OR = 375,
+    AND = 376,
+    UMINUS = 377
   };
 #endif
 /* Tokens.  */
@@ -283,20 +288,19 @@ extern int pcap_debug;
 #define HOPC 371
 #define HDPC 372
 #define HSLS 373
-#define OR 374
-#define AND 375
-#define UMINUS 376
+#define LEX_ERROR 374
+#define OR 375
+#define AND 376
+#define UMINUS 377
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-
 union YYSTYPE
 {
-#line 286 "grammar.y" /* yacc.c:1909  */
+#line 291 "grammar.y"
 
 	int i;
 	bpf_u_int32 h;
-	u_char *e;
 	char *s;
 	struct stmt *stmt;
 	struct arth *a;
@@ -308,9 +312,9 @@ union YYSTYPE
 	} blk;
 	struct block *rblk;
 
-#line 312 "grammar.h" /* yacc.c:1909  */
-};
+#line 316 "grammar.h"
 
+};
 typedef union YYSTYPE YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
