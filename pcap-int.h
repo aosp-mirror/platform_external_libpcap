@@ -40,17 +40,8 @@
 
 #include <pcap/pcap.h>
 
-#ifdef MSDOS
-  #include <fcntl.h>
-  #include <io.h>
-#endif
-
 #include "varattrs.h"
 #include "fmtutils.h"
-
-#include <stdarg.h>
-
-#include "portability.h"
 
 /*
  * Version string.
@@ -88,6 +79,11 @@ extern int pcap_new_api;
  * of the setting of this flag.
  */
 extern int pcap_utf_8_mode;
+
+#ifdef MSDOS
+  #include <fcntl.h>
+  #include <io.h>
+#endif
 
 /*
  * Swap byte ordering of unsigned long long timestamp on a big endian
@@ -437,6 +433,10 @@ struct oneshot_userdata {
 
 int	pcap_offline_read(pcap_t *, int, pcap_handler, u_char *);
 
+#include <stdarg.h>
+
+#include "portability.h"
+
 /*
  * Does the packet count argument to a module's read routine say
  * "supply packets until you run out of packets"?
@@ -592,7 +592,7 @@ pcap_funcptr_t		pcap_find_function(pcap_code_handle_t, const char *);
  * Linux kernel when the kernel rejects the filter (requiring us to
  * run it in userland).  It contains VLAN tag information.
  */
-struct pcap_bpf_aux_data {
+struct bpf_aux_data {
 	u_short vlan_tag_present;
 	u_short vlan_tag;
 };
@@ -602,7 +602,7 @@ struct pcap_bpf_aux_data {
  * argument.
  */
 u_int	pcap_filter_with_aux_data(const struct bpf_insn *,
-    const u_char *, u_int, u_int, const struct pcap_bpf_aux_data *);
+    const u_char *, u_int, u_int, const struct bpf_aux_data *);
 
 /*
  * Filtering routine that doesn't.
