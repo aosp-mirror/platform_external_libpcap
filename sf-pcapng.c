@@ -101,8 +101,7 @@ struct section_header_block {
 
 /*
  * Current version number.  If major_version isn't PCAP_NG_VERSION_MAJOR,
- * or if minor_version isn't PCAP_NG_VERSION_MINOR or 2, that means that
- * this code can't read the file.
+ * that means that this code can't read the file.
  */
 #define PCAP_NG_VERSION_MAJOR	1
 #define PCAP_NG_VERSION_MINOR	0
@@ -963,23 +962,9 @@ pcap_ng_check_header(const uint8_t *magic, FILE *fp, u_int precision,
 		 * XXX - we don't care about the section length.
 		 */
 	}
-	/* Currently only SHB versions 1.0 and 1.2 are supported;
-	   version 1.2 is treated as being the same as version 1.0.
-	   See the current version of the pcapng specification.
-
-	   Version 1.2 is written by some programs that write additional
-	   block types (which can be read by any code that handles them,
-	   regardless of whether the minor version if 0 or 2, so that's
-	   not a reason to change the minor version number).
-
-	   XXX - the pcapng specification says that readers should
-	   just ignore sections with an unsupported version number;
-	   presumably they can also report an error if they skip
-	   all the way to the end of the file without finding
-	   any versions that they support. */
+	/* currently only SHB version 1.0 is supported */
 	if (! (shbp->major_version == PCAP_NG_VERSION_MAJOR &&
-	       (shbp->minor_version == PCAP_NG_VERSION_MINOR ||
-	        shbp->minor_version == 2))) {
+	       shbp->minor_version == PCAP_NG_VERSION_MINOR)) {
 		snprintf(errbuf, PCAP_ERRBUF_SIZE,
 		    "unsupported pcapng savefile version %u.%u",
 		    shbp->major_version, shbp->minor_version);
