@@ -43,6 +43,7 @@
 #include <netinet/tcp.h>
 #include <netinet/tcpip.h>
 
+#include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
 
@@ -167,7 +168,7 @@ pcap_read_nit(pcap_t *p, int cnt, pcap_handler callback, u_char *user)
 			continue;
 
 		default:
-			snprintf(p->errbuf, sizeof(p->errbuf),
+			pcap_snprintf(p->errbuf, sizeof(p->errbuf),
 			    "bad nit state %d", nh->nh_state);
 			return (-1);
 		}
@@ -178,7 +179,7 @@ pcap_read_nit(pcap_t *p, int cnt, pcap_handler callback, u_char *user)
 		caplen = nh->nh_wirelen;
 		if (caplen > p->snapshot)
 			caplen = p->snapshot;
-		if (pcap_filter(p->fcode.bf_insns, cp, nh->nh_wirelen, caplen)) {
+		if (bpf_filter(p->fcode.bf_insns, cp, nh->nh_wirelen, caplen)) {
 			struct pcap_pkthdr h;
 			h.ts = nh->nh_timestamp;
 			h.len = nh->nh_wirelen;
@@ -196,7 +197,7 @@ pcap_read_nit(pcap_t *p, int cnt, pcap_handler callback, u_char *user)
 }
 
 static int
-pcap_inject_nit(pcap_t *p, const void *buf, int size)
+pcap_inject_nit(pcap_t *p, const void *buf, size_t size)
 {
 	struct sockaddr sa;
 	int ret;
@@ -370,7 +371,7 @@ pcap_create_interface(const char *device _U_, char *ebuf)
 {
 	pcap_t *p;
 
-	p = PCAP_CREATE_COMMON(ebuf, struct pcap_nit);
+	p = pcap_create_common(ebuf, sizeof (struct pcap_nit));
 	if (p == NULL)
 		return (NULL);
 

@@ -31,11 +31,11 @@ const char *pcap_statustostr(int error);
 .ft
 .fi
 .SH DESCRIPTION
-.BR pcap_statustostr ()
+.B pcap_statustostr()
 converts a
 .B PCAP_ERROR_
 or
 .B PCAP_WARNING_
 value returned by a libpcap routine to an error string.
 .SH SEE ALSO
-.BR pcap (3PCAP)
+pcap(3PCAP)

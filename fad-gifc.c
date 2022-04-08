@@ -49,13 +49,19 @@ struct rtentry;		/* declarations in <net/if.h> */
 #include <net/if.h>
 #include <netinet/in.h>
 
+#include <ctype.h>
 #include <errno.h>
 #include <memory.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+
+#ifdef HAVE_LIMITS_H
 #include <limits.h>
+#else
+#define INT_MAX		2147483647
+#endif
 
 #include "pcap-int.h"
 
@@ -172,7 +178,7 @@ pcap_findalldevs_interfaces(pcap_if_list_t *devlistp, char *errbuf,
 		 * Don't let the buffer size get bigger than INT_MAX.
 		 */
 		if (buf_size > INT_MAX) {
-			(void)snprintf(errbuf, PCAP_ERRBUF_SIZE,
+			(void)pcap_snprintf(errbuf, PCAP_ERRBUF_SIZE,
 			    "interface information requires more than %u bytes",
 			    INT_MAX);
 			(void)close(fd);
@@ -393,7 +399,7 @@ pcap_findalldevs_interfaces(pcap_if_list_t *devlistp, char *errbuf,
 			 * We have a ":"; is it followed by a number?
 			 */
 			q = p + 1;
-			while (PCAP_ISDIGIT(*q))
+			while (isdigit((unsigned char)*q))
 				q++;
 			if (*q == '\0') {
 				/*

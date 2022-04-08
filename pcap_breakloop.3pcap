@@ -17,7 +17,7 @@
 .\" WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 .\" MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 .\"
-.TH PCAP_BREAKLOOP 3PCAP "25 July 2018"
+.TH PCAP_BREAKLOOP 3PCAP "8 November 2017"
 .SH NAME
 pcap_breakloop \- force a pcap_dispatch() or pcap_loop() call to return
 .SH SYNOPSIS
@@ -31,15 +31,14 @@ void pcap_breakloop(pcap_t *);
 .ft
 .fi
 .SH DESCRIPTION
-.BR pcap_breakloop ()
+.B pcap_breakloop()
 sets a flag that will force
-.BR pcap_dispatch (3PCAP)
+.B pcap_dispatch()
 or
-.BR pcap_loop (3PCAP)
+.B pcap_loop()
 to return rather than looping; they will return the number of packets
-that have been processed so far, or
-.B PCAP_ERROR_BREAK
-if no packets have been processed so far.
+that have been processed so far, or \-2 if no packets have been
+processed so far.
 .PP
 This routine is safe to use inside a signal handler on UNIX or a console
 control handler on Windows, as it merely sets a flag that is checked
@@ -61,7 +60,7 @@ packets arrive and the call completes.
 .PP
 .ft B
 Note also that, in a multi-threaded application, if one thread is
-blocked in pcap_dispatch(), pcap_loop(), pcap_next(3PCAP), or pcap_next_ex(3PCAP),
+blocked in pcap_dispatch(), pcap_loop(), pcap_next(), or pcap_next_ex(),
 a call to pcap_breakloop() in a different thread will not unblock that
 thread.
 .ft R
@@ -69,9 +68,9 @@ You will need to use whatever mechanism the OS provides for
 breaking a thread out of blocking calls in order to unblock the thread,
 such as thread cancellation or thread signalling in systems that support
 POSIX threads, or
-.BR SetEvent ()
+.B SetEvent()
 on the result of
-.BR pcap_getevent ()
+.B pcap_getevent()
 on a
 .B pcap_t
 on which the thread is blocked on Windows.  Asynchronous procedure calls
@@ -81,35 +80,31 @@ will not be in an alertable state.
 .ft R
 .PP
 Note that
-.BR pcap_next ()
+.B pcap_next()
 and
-.BR pcap_next_ex ()
+.B pcap_next_ex()
 will, on some platforms, loop reading packets from the OS; that loop
 will not necessarily be terminated by a signal, so
-.BR pcap_breakloop ()
+.B pcap_breakloop()
 should be used to terminate packet processing even if
-.BR pcap_next ()
+.B pcap_next()
 or
-.BR pcap_next_ex ()
+.B pcap_next_ex()
 is being used.
 .PP
-.BR pcap_breakloop ()
+.B pcap_breakloop()
 does not guarantee that no further packets will be processed by
-.BR pcap_dispatch ()
+.B pcap_dispatch()
 or
-.BR pcap_loop ()
+.B pcap_loop()
 after it is called; at most one more packet might be processed.
 .PP
-If
-.B PCAP_ERROR_BREAK
-is returned from
-.BR pcap_dispatch ()
+If \-2 is returned from
+.B pcap_dispatch()
 or
-.BR pcap_loop (),
+.BR pcap_loop() ,
 the flag is cleared, so a subsequent call will resume reading packets.
 If a positive number is returned, the flag is not cleared, so a
-subsequent call will return
-.B PCAP_ERROR_BREAK
-and clear the flag.
+subsequent call will return \-2 and clear the flag.
 .SH SEE ALSO
-.BR pcap (3PCAP)
+pcap(3PCAP), pcap_loop(3PCAP), pcap_next_ex(3PCAP)

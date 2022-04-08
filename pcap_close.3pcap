@@ -31,9 +31,9 @@ void pcap_close(pcap_t *p);
 .ft
 .fi
 .SH DESCRIPTION
-.BR pcap_close ()
+.B pcap_close()
 closes the files associated with
 .I p
 and deallocates resources.
 .SH SEE ALSO
-.BR pcap (3PCAP)
+pcap(3PCAP)

@@ -83,20 +83,22 @@
    * least with HP's C compiler; hopefully doing so won't make it
    * *not* work with *un*-threaded code.
    */
-#else
+#elif defined(__linux__) || defined(linux) || defined(__linux)
   /*
-   * Turn on _GNU_SOURCE to get everything GNU libc has to offer,
-   * including asprintf(), if we're using GNU libc.
+   * We can't turn _GNU_SOURCE on because some versions of GNU Libc
+   * will give the GNU version of strerror_r(), which returns a
+   * string pointer and doesn't necessarily fill in the buffer,
+   * rather than the standard version of strerror_r(), which
+   * returns 0 or an errno and always fills in the buffer.  We
+   * require both of the latter behaviors.
    *
-   * Unfortunately, one thing it has to offer is a strerror_r()
-   * that's not POSIX-compliant, but we deal with that in
-   * pcap_fmt_errmsg_for_errno().
-   *
-   * We don't limit this to, for example, Linux and Cygwin, because
-   * this might, for example, be GNU/HURD or one of Debian's kFreeBSD
-   * OSes ("GNU/FreeBSD").
+   * So we try turning everything else on that we can.  This includes
+   * defining _XOPEN_SOURCE as 600, because we want to force crypt()
+   * to be declared on systems that use GNU libc, such as most Linux
+   * distributions.
    */
-  #define _GNU_SOURCE
+  #define _POSIX_C_SOURCE 200809L
+  #define _XOPEN_SOURCE 600
 
   /*
    * We turn on both _DEFAULT_SOURCE and _BSD_SOURCE to try to get

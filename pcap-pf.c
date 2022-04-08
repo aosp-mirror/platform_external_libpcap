@@ -48,6 +48,7 @@ struct rtentry;
 #include <netinet/tcp.h>
 #include <netinet/tcpip.h>
 
+#include <ctype.h>
 #include <errno.h>
 #include <netdb.h>
 #include <stdio.h>
@@ -103,7 +104,9 @@ pcap_read_pf(pcap_t *pc, int cnt, pcap_handler callback, u_char *user)
 	register u_char *p, *bp;
 	register int cc, n, buflen, inc;
 	register struct enstamp *sp;
+#ifdef LBL_ALIGN
 	struct enstamp stamp;
+#endif
 	register u_int pad;
 
  again:
@@ -157,17 +160,19 @@ pcap_read_pf(pcap_t *pc, int cnt, pcap_handler callback, u_char *user)
 			}
 		}
 		if (cc < sizeof(*sp)) {
-			snprintf(pc->errbuf, sizeof(pc->errbuf),
+			pcap_snprintf(pc->errbuf, sizeof(pc->errbuf),
 			    "pf short read (%d)", cc);
 			return (-1);
 		}
+#ifdef LBL_ALIGN
 		if ((long)bp & 3) {
 			sp = &stamp;
 			memcpy((char *)sp, (char *)bp, sizeof(*sp));
 		} else
+#endif
 			sp = (struct enstamp *)bp;
 		if (sp->ens_stamplen != sizeof(*sp)) {
-			snprintf(pc->errbuf, sizeof(pc->errbuf),
+			pcap_snprintf(pc->errbuf, sizeof(pc->errbuf),
 			    "pf short stamplen (%d)",
 			    sp->ens_stamplen);
 			return (-1);
@@ -200,7 +205,7 @@ pcap_read_pf(pcap_t *pc, int cnt, pcap_handler callback, u_char *user)
 		 * skipping that padding.
 		 */
 		if (pf->filtering_in_kernel ||
-		    pcap_filter(pc->fcode.bf_insns, p, sp->ens_count, buflen)) {
+		    bpf_filter(pc->fcode.bf_insns, p, sp->ens_count, buflen)) {
 			struct pcap_pkthdr h;
 			pf->TotAccepted++;
 			h.ts = sp->ens_tstamp;
@@ -221,7 +226,7 @@ pcap_read_pf(pcap_t *pc, int cnt, pcap_handler callback, u_char *user)
 }
 
 static int
-pcap_inject_pf(pcap_t *p, const void *buf, int size)
+pcap_inject_pf(pcap_t *p, const void *buf, size_t size)
 {
 	int ret;
 
@@ -256,7 +261,7 @@ pcap_stats_pf(pcap_t *p, struct pcap_stat *ps)
 	 *	full.
 	 *
 	 *	"ps_ifdrop" counts packets dropped by the network
-	 *	interface (regardless of whether they would have passed
+	 *	inteface (regardless of whether they would have passed
 	 *	the input filter, of course).
 	 *
 	 * If packet filtering is not being done in the kernel:
@@ -268,7 +273,7 @@ pcap_stats_pf(pcap_t *p, struct pcap_stat *ps)
 	 *	the userland filter.
 	 *
 	 *	"ps_ifdrop" counts packets dropped by the network
-	 *	interface (regardless of whether they would have passed
+	 *	inteface (regardless of whether they would have passed
 	 *	the input filter, of course).
 	 *
 	 * These statistics don't include packets not yet read from
@@ -326,7 +331,7 @@ pcap_activate_pf(pcap_t *p)
 		p->fd = pfopen(p->opt.device, O_RDONLY);
 	if (p->fd < 0) {
 		if (errno == EACCES) {
-			snprintf(p->errbuf, PCAP_ERRBUF_SIZE,
+			pcap_snprintf(p->errbuf, PCAP_ERRBUF_SIZE,
 			    "pf open: %s: Permission denied\n"
 "your system may not be properly configured; see the packetfilter(4) man page",
 			    p->opt.device);
@@ -459,7 +464,7 @@ pcap_activate_pf(pcap_t *p)
 		 * framing", there's not much we can do, as that
 		 * doesn't specify a particular type of header.
 		 */
-		snprintf(p->errbuf, PCAP_ERRBUF_SIZE,
+		pcap_snprintf(p->errbuf, PCAP_ERRBUF_SIZE,
 		    "unknown data-link type %u", devparams.end_dev_type);
 		err = PCAP_ERROR;
 		goto bad;
@@ -535,7 +540,7 @@ pcap_create_interface(const char *device _U_, char *ebuf)
 {
 	pcap_t *p;
 
-	p = PCAP_CREATE_COMMON(ebuf, struct pcap_pf);
+	p = pcap_create_common(ebuf, sizeof (struct pcap_pf));
 	if (p == NULL)
 		return (NULL);
 

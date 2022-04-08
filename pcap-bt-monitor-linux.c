@@ -50,14 +50,6 @@
 #define INTERFACE_NAME "bluetooth-monitor"
 
 /*
- * Private data.
- * Currently contains nothing.
- */
-struct pcap_bt_monitor {
-	int	dummy;
-};
-
-/*
  * Fields and alignment must match the declaration in the Linux kernel 3.4+.
  * See struct hci_mon_hdr in include/net/bluetooth/hci_mon.h.
  */
@@ -132,7 +124,7 @@ bt_monitor_read(pcap_t *handle, int max_packets _U_, pcap_handler callback, u_ch
         return -1;
     }
 
-    pkth.caplen = (bpf_u_int32)(ret - sizeof(hdr) + sizeof(pcap_bluetooth_linux_monitor_header));
+    pkth.caplen = ret - sizeof(hdr) + sizeof(pcap_bluetooth_linux_monitor_header);
     pkth.len = pkth.caplen;
 
     for (cmsg = CMSG_FIRSTHDR(&msg); cmsg != NULL; cmsg = CMSG_NXTHDR(&msg, cmsg)) {
@@ -147,7 +139,7 @@ bt_monitor_read(pcap_t *handle, int max_packets _U_, pcap_handler callback, u_ch
     bthdr->opcode = htons(hdr.opcode);
 
     if (handle->fcode.bf_insns == NULL ||
-        pcap_filter(handle->fcode.bf_insns, pktd, pkth.len, pkth.caplen)) {
+        bpf_filter(handle->fcode.bf_insns, pktd, pkth.len, pkth.caplen)) {
         callback(user, &pkth, pktd);
         return 1;
     }
@@ -155,11 +147,17 @@ bt_monitor_read(pcap_t *handle, int max_packets _U_, pcap_handler callback, u_ch
 }
 
 static int
-bt_monitor_inject(pcap_t *handle, const void *buf _U_, int size _U_)
+bt_monitor_inject(pcap_t *handle, const void *buf _U_, size_t size _U_)
 {
-    snprintf(handle->errbuf, PCAP_ERRBUF_SIZE,
-        "Packet injection is not supported yet on Bluetooth monitor devices");
+    pcap_snprintf(handle->errbuf, PCAP_ERRBUF_SIZE, "inject not supported yet");
     return -1;
+}
+
+static int
+bt_monitor_setdirection(pcap_t *p, pcap_direction_t d)
+{
+    p->direction = d;
+    return 0;
 }
 
 static int
@@ -201,7 +199,7 @@ bt_monitor_activate(pcap_t* handle)
     handle->read_op = bt_monitor_read;
     handle->inject_op = bt_monitor_inject;
     handle->setfilter_op = install_bpf_program; /* no kernel filtering */
-    handle->setdirection_op = NULL; /* Not implemented */
+    handle->setdirection_op = bt_monitor_setdirection;
     handle->set_datalink_op = NULL; /* can't change data link type */
     handle->getnonblock_op = pcap_getnonblock_fd;
     handle->setnonblock_op = pcap_setnonblock_fd;
@@ -264,7 +262,7 @@ bt_monitor_create(const char *device, char *ebuf, int *is_ours)
     }
 
     *is_ours = 1;
-    p = PCAP_CREATE_COMMON(ebuf, struct pcap_bt_monitor);
+    p = pcap_create_common(ebuf, 0);
     if (p == NULL)
         return NULL;
 

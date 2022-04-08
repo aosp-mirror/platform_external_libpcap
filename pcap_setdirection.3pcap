@@ -17,7 +17,7 @@
 .\" WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 .\" MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 .\"
-.TH PCAP_SETDIRECTION 3PCAP "25 July 2018"
+.TH PCAP_SETDIRECTION 3PCAP "8 March 2015"
 .SH NAME
 pcap_setdirection \- set the direction for which packets will be captured
 .SH SYNOPSIS
@@ -31,7 +31,7 @@ int pcap_setdirection(pcap_t *p, pcap_direction_t d);
 .ft
 .fi
 .SH DESCRIPTION
-.BR pcap_setdirection ()
+.B pcap_setdirection()
 is used to specify a direction that packets will be captured.
 .I d
 is one of the constants
@@ -48,7 +48,7 @@ will capture packets received by or sent by the device.
 .B PCAP_D_INOUT
 is the default setting if this function is not called.
 .PP
-.BR pcap_setdirection ()
+.B pcap_setdirection()
 isn't necessarily fully supported on all platforms; some platforms might
 return an error for all values, and some other platforms might not
 support
@@ -56,19 +56,14 @@ support
 .PP
 This operation is not supported if a ``savefile'' is being read.
 .SH RETURN VALUE
-.BR pcap_setdirection ()
-returns
-.B 0
-on success and
-.B PCAP_ERROR
-on failure. If
-.B PCAP_ERROR
-is returned,
-.BR pcap_geterr (3PCAP)
+.B pcap_setdirection()
+returns 0 on success and \-1 on failure.
+If \-1 is returned,
+.B pcap_geterr()
 or
-.BR pcap_perror (3PCAP)
+.B pcap_perror()
 may be called with
 .I p
 as an argument to fetch or display the error text.
 .SH SEE ALSO
-.BR pcap (3PCAP)
+pcap(3PCAP), pcap_geterr(3PCAP)

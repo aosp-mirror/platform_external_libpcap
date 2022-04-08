@@ -58,7 +58,7 @@
 /* forward declaration */
 static int bt_activate(pcap_t *);
 static int bt_read_linux(pcap_t *, int , pcap_handler , u_char *);
-static int bt_inject_linux(pcap_t *, const void *, int);
+static int bt_inject_linux(pcap_t *, const void *, size_t);
 static int bt_setdirection_linux(pcap_t *, pcap_direction_t);
 static int bt_stats_linux(pcap_t *, struct pcap_stat *);
 
@@ -74,14 +74,13 @@ bt_findalldevs(pcap_if_list_t *devlistp, char *err_str)
 {
 	struct hci_dev_list_req *dev_list;
 	struct hci_dev_req *dev_req;
-	int sock;
-	unsigned i;
+	int i, sock;
 	int ret = 0;
 
 	sock  = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
 	if (sock < 0)
 	{
-		/* if bluetooth is not supported this is not fatal*/
+		/* if bluetooth is not supported this this is not fatal*/
 		if (errno == EAFNOSUPPORT)
 			return 0;
 		pcap_fmt_errmsg_for_errno(err_str, PCAP_ERRBUF_SIZE,
@@ -92,7 +91,7 @@ bt_findalldevs(pcap_if_list_t *devlistp, char *err_str)
 	dev_list = malloc(HCI_MAX_DEV * sizeof(*dev_req) + sizeof(*dev_list));
 	if (!dev_list)
 	{
-		snprintf(err_str, PCAP_ERRBUF_SIZE, "Can't allocate %zu bytes for Bluetooth device list",
+		pcap_snprintf(err_str, PCAP_ERRBUF_SIZE, "Can't allocate %zu bytes for Bluetooth device list",
 			HCI_MAX_DEV * sizeof(*dev_req) + sizeof(*dev_list));
 		ret = -1;
 		goto done;
@@ -110,10 +109,10 @@ bt_findalldevs(pcap_if_list_t *devlistp, char *err_str)
 
 	dev_req = dev_list->dev_req;
 	for (i = 0; i < dev_list->dev_num; i++, dev_req++) {
-		char dev_name[20], dev_descr[40];
+		char dev_name[20], dev_descr[30];
 
-		snprintf(dev_name, sizeof(dev_name), BT_IFACE"%u", dev_req->dev_id);
-		snprintf(dev_descr, sizeof(dev_descr), "Bluetooth adapter number %u", i);
+		pcap_snprintf(dev_name, 20, BT_IFACE"%d", dev_req->dev_id);
+		pcap_snprintf(dev_descr, 30, "Bluetooth adapter number %d", i);
 
 		/*
 		 * Bluetooth is a wireless technology.
@@ -173,7 +172,7 @@ bt_create(const char *device, char *ebuf, int *is_ours)
 	/* OK, it's probably ours. */
 	*is_ours = 1;
 
-	p = PCAP_CREATE_COMMON(ebuf, struct pcap_bt);
+	p = pcap_create_common(ebuf, sizeof (struct pcap_bt));
 	if (p == NULL)
 		return (NULL);
 
@@ -194,7 +193,7 @@ bt_activate(pcap_t* handle)
 	/* get bt interface id */
 	if (sscanf(handle->opt.device, BT_IFACE"%d", &dev_id) != 1)
 	{
-		snprintf(handle->errbuf, PCAP_ERRBUF_SIZE,
+		pcap_snprintf(handle->errbuf, PCAP_ERRBUF_SIZE,
 			"Can't get Bluetooth device index from %s",
 			 handle->opt.device);
 		return PCAP_ERROR;
@@ -346,7 +345,7 @@ bt_read_linux(pcap_t *handle, int max_packets _U_, pcap_handler callback, u_char
 		return -1;
 	}
 
-	pkth.caplen = (bpf_u_int32)ret;
+	pkth.caplen = ret;
 
 	/* get direction and timestamp*/
 	cmsg = CMSG_FIRSTHDR(&msg);
@@ -362,27 +361,15 @@ bt_read_linux(pcap_t *handle, int max_packets _U_, pcap_handler callback, u_char
 		}
 		cmsg = CMSG_NXTHDR(&msg, cmsg);
 	}
-	switch (handle->direction) {
-
-	case PCAP_D_IN:
-		if (!in)
-			return 0;
-		break;
-
-	case PCAP_D_OUT:
-		if (in)
-			return 0;
-		break;
-
-	default:
-		break;
-	}
+	if ((in && (handle->direction == PCAP_D_OUT)) ||
+				((!in) && (handle->direction == PCAP_D_IN)))
+		return 0;
 
 	bthdr->direction = htonl(in != 0);
 	pkth.caplen+=sizeof(pcap_bluetooth_h4_header);
 	pkth.len = pkth.caplen;
 	if (handle->fcode.bf_insns == NULL ||
-	    pcap_filter(handle->fcode.bf_insns, pktd, pkth.len, pkth.caplen)) {
+	    bpf_filter(handle->fcode.bf_insns, pktd, pkth.len, pkth.caplen)) {
 		callback(user, &pkth, pktd);
 		return 1;
 	}
@@ -390,10 +377,10 @@ bt_read_linux(pcap_t *handle, int max_packets _U_, pcap_handler callback, u_char
 }
 
 static int
-bt_inject_linux(pcap_t *handle, const void *buf _U_, int size _U_)
+bt_inject_linux(pcap_t *handle, const void *buf _U_, size_t size _U_)
 {
-	snprintf(handle->errbuf, PCAP_ERRBUF_SIZE,
-	    "Packet injection is not supported on Bluetooth devices");
+	pcap_snprintf(handle->errbuf, PCAP_ERRBUF_SIZE, "inject not supported on "
+    		"bluetooth devices");
 	return (-1);
 }
 
@@ -430,10 +417,6 @@ bt_stats_linux(pcap_t *handle, struct pcap_stat *stats)
 static int
 bt_setdirection_linux(pcap_t *p, pcap_direction_t d)
 {
-	/*
-	 * It's guaranteed, at this point, that d is a valid
-	 * direction value.
-	 */
 	p->direction = d;
 	return 0;
 }

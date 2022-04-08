@@ -31,16 +31,13 @@ int pcap_can_set_rfmon(pcap_t *p);
 .ft
 .fi
 .SH DESCRIPTION
-.BR pcap_can_set_rfmon ()
+.B pcap_can_set_rfmon()
 checks whether monitor mode could be set on a capture handle when
 the handle is activated.
 .SH RETURN VALUE
-.BR pcap_can_set_rfmon ()
-returns
-.B 0
-if monitor mode could not be set,
-.B 1
-if monitor mode could be set, and a negative value on error.
+.B pcap_can_set_rfmon()
+returns 0 if monitor mode could not be set,
+1 if monitor mode could be set, and a negative value on error.
 A negative return value indicates what error condition occurred.
 The possible error values are:
 .TP
@@ -57,24 +54,19 @@ The capture handle has already been activated.
 .TP
 .B PCAP_ERROR
 Another error occurred.
-.BR pcap_geterr (3PCAP)
+.B pcap_geterr()
 or
-.BR \%pcap_perror (3PCAP)
+.B pcap_perror()
 may be called with
 .I p
 as an argument to fetch or display a message describing the error.
 .LP
 Additional error codes may be added in the future; a program should
-check for
-.BR 0 ,
-.BR 1 ,
-and negative, return codes, and treat all negative
+check for 0, 1, and negative, return codes, and treat all negative
 return codes as errors.
-.BR pcap_statustostr (3PCAP)
+.B pcap_statustostr()
 can be called, with a warning or error code as an argument, to fetch a
 message describing the warning or error code.
 .SH SEE ALSO
-.BR pcap (3PCAP),
-.BR pcap_create (3PCAP),
-.BR pcap_activate (3PCAP),
-.BR pcap_set_rfmon (3PCAP)
+pcap(3PCAP), pcap_create(3PCAP), pcap_activate(3PCAP),
+pcap_set_rfmon(3PCAP)

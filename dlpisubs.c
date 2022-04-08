@@ -114,20 +114,6 @@ pcap_stats_dlpi(pcap_t *p, struct pcap_stat *ps)
 }
 
 /*
- * Does the processor for which we're compiling this support aligned loads?
- */
-#if (defined(__i386__) || defined(_M_IX86) || defined(__X86__) || defined(__x86_64__) || defined(_M_X64)) || \
-    (defined(__arm__) || defined(_M_ARM) || defined(__aarch64__)) || \
-    (defined(__m68k__) && (!defined(__mc68000__) && !defined(__mc68010__))) || \
-    (defined(__ppc__) || defined(__ppc64__) || defined(_M_PPC) || defined(_ARCH_PPC) || defined(_ARCH_PPC64)) || \
-    (defined(__s390__) || defined(__s390x__) || defined(__zarch__))
-    /* Yes, it does. */
-#else
-    /* No, it doesn't. */
-    #define REQUIRE_ALIGNMENT
-#endif
-
-/*
  * Loop through the packets and call the callback for each packet.
  * Return the number of packets read.
  */
@@ -141,7 +127,7 @@ pcap_process_pkts(pcap_t *p, pcap_handler callback, u_char *user,
 	struct pcap_pkthdr pkthdr;
 #ifdef HAVE_SYS_BUFMOD_H
 	struct sb_hdr *sbp;
-#ifdef REQUIRE_ALIGNMENT
+#ifdef LBL_ALIGN
 	struct sb_hdr sbhdr;
 #endif
 #endif
@@ -171,7 +157,7 @@ pcap_process_pkts(pcap_t *p, pcap_handler callback, u_char *user,
 				return (n);
 			}
 		}
-#ifdef REQUIRE_ALIGNMENT
+#ifdef LBL_ALIGN
 		if ((long)bufp & 3) {
 			sbp = &sbhdr;
 			memcpy(sbp, bufp, sizeof(*sbp));
@@ -190,7 +176,7 @@ pcap_process_pkts(pcap_t *p, pcap_handler callback, u_char *user,
 		bufp += caplen;
 #endif
 		++pd->stat.ps_recv;
-		if (pcap_filter(p->fcode.bf_insns, pk, origlen, caplen)) {
+		if (bpf_filter(p->fcode.bf_insns, pk, origlen, caplen)) {
 #ifdef HAVE_SYS_BUFMOD_H
 			pkthdr.ts.tv_sec = sbp->sbh_timestamp.tv_sec;
 			pkthdr.ts.tv_usec = sbp->sbh_timestamp.tv_usec;
@@ -289,7 +275,7 @@ pcap_process_mactype(pcap_t *p, u_int mactype)
 		 * XXX - DL_IPNET devices default to "raw IP" rather than
 		 * "IPNET header"; see
 		 *
-		 *    https://seclists.org/tcpdump/2009/q1/202
+		 *    http://seclists.org/tcpdump/2009/q1/202
 		 *
 		 * We'd have to do DL_IOC_IPNET_INFO to enable getting
 		 * the IPNET header.
@@ -300,7 +286,7 @@ pcap_process_mactype(pcap_t *p, u_int mactype)
 #endif
 
 	default:
-		snprintf(p->errbuf, PCAP_ERRBUF_SIZE, "unknown mactype 0x%x",
+		pcap_snprintf(p->errbuf, PCAP_ERRBUF_SIZE, "unknown mactype 0x%x",
 		    mactype);
 		retv = -1;
 	}

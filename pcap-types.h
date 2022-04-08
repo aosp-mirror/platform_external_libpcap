@@ -35,6 +35,7 @@
  * Get u_int defined, by hook or by crook.
  */
 #ifdef _WIN32
+
   /*
    * This defines u_int.
    */

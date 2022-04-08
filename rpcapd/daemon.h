@@ -33,19 +33,12 @@
 #ifndef __DAEMON_H__
 #define __DAEMON_H__
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-#include "sslutils.h"
-
 //
 // Returns 1 if the client closed the control connection explicitly, 0
-// otherwise; the return value is used only by callers that call us
-// for active mode.
+// otherwise; used in active mode only.
 //
-int daemon_serviceloop(SOCKET sockctrl, int isactive, char *passiveClients,
-    int nullAuthAllowed, int uses_ssl);
+int daemon_serviceloop(SOCKET sockctrl_in, SOCKET sockctrl_out, int isactive,
+    int nullAuthAllowed);
 
 void sleep_secs(int secs);
 

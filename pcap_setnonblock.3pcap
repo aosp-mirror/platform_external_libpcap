@@ -17,7 +17,7 @@
 .\" WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 .\" MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 .\"
-.TH PCAP_SETNONBLOCK 3PCAP "25 July 2018"
+.TH PCAP_SETNONBLOCK 3PCAP "18 October 2014"
 .SH NAME
 pcap_setnonblock, pcap_getnonblock \- set or get the state of
 non-blocking mode on a capture device
@@ -38,58 +38,38 @@ int pcap_getnonblock(pcap_t *p, char *errbuf);
 .ft
 .fi
 .SH DESCRIPTION
-.BR pcap_setnonblock ()
+.B pcap_setnonblock()
 puts a capture handle into ``non-blocking'' mode, or takes it out
 of ``non-blocking'' mode, depending on whether the
 .I nonblock
 argument is non-zero or zero.  It has no effect on ``savefiles''.
-If there is an error,
-.B PCAP_ERROR
-is returned and
+If there is an error, \-1 is returned and
 .I errbuf
-is filled in with an appropriate error message; otherwise,
-.B 0
-is returned.
-.PP
+is filled in with an appropriate error message; otherwise, 0 is
+returned.
 In
 ``non-blocking'' mode, an attempt to read from the capture descriptor
 with
-.BR pcap_dispatch (3PCAP)
-and
-.BR pcap_next_ex (3PCAP)
-will, if no packets are currently available to be read, return
-.B 0
+.B pcap_dispatch()
+will, if no packets are currently available to be read, return 0
 immediately rather than blocking waiting for packets to arrive.
-.PP
-.BR pcap_loop (3PCAP)
-will loop forever, consuming CPU time when no packets are currently
-available;
-.BR pacp_dispatch ()
-should be used instead.
-.BR pcap_next (3PCAP)
-will return
-.B NULL
-if there are no packets currently available to read;
-this is indistinguishable from an error, so
-.BR pcap_next_ex ()
-should be used instead.
+.B pcap_loop()
+and
+.B pcap_next()
+will not work in ``non-blocking'' mode.
 .PP
 When first activated with
-.BR pcap_activate (3PCAP)
+.B pcap_activate()
 or opened with
-.BR pcap_open_live (3PCAP) ,
+.B pcap_open_live() ,
 a capture handle is not in ``non-blocking mode''; a call to
-.BR pcap_setnonblock ()
+.B pcap_setnonblock()
 is required in order to put it into ``non-blocking'' mode.
 .SH RETURN VALUE
-.BR pcap_getnonblock ()
+.B pcap_getnonblock()
 returns the current ``non-blocking'' state of the capture descriptor; it
-always returns
-.B 0
-on ``savefiles''.
-If there is an error,
-.B PCAP_ERROR
-is returned and
+always returns 0 on ``savefiles''.
+If there is an error, \-1 is returned and
 .I errbuf
 is filled in with an appropriate error message.
 .PP
@@ -98,6 +78,4 @@ is assumed to be able to hold at least
 .B PCAP_ERRBUF_SIZE
 chars.
 .SH SEE ALSO
-.BR pcap (3PCAP),
-.BR pcap_next_ex (3PCAP),
-.BR pcap_geterr (3PCAP)
+pcap(3PCAP), pcap_loop(3PCAP), pcap_next_ex(3PCAP), pcap_geterr(3PCAP)

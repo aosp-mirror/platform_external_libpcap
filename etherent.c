@@ -25,6 +25,7 @@
 
 #include <pcap-types.h>
 
+#include <ctype.h>
 #include <memory.h>
 #include <stdio.h>
 #include <string.h>
@@ -44,18 +45,14 @@ static inline int skip_line(FILE *);
 static inline u_char
 xdtoi(u_char c)
 {
-	if (c >= '0' && c <= '9')
+	if (isdigit(c))
 		return (u_char)(c - '0');
-	else if (c >= 'a' && c <= 'f')
+	else if (islower(c))
 		return (u_char)(c - 'a' + 10);
 	else
 		return (u_char)(c - 'A' + 10);
 }
 
-/*
- * Skip linear white space (space and tab) and any CRs before LF.
- * Stop when we hit a non-white-space character or an end-of-line LF.
- */
 static inline int
 skip_space(FILE *f)
 {
@@ -63,7 +60,7 @@ skip_space(FILE *f)
 
 	do {
 		c = getc(f);
-	} while (c == ' ' || c == '\t' || c == '\r');
+	} while (isspace(c) && c != '\n');
 
 	return c;
 }
@@ -100,7 +97,7 @@ pcap_next_etherent(FILE *fp)
 
 		/* If this is a comment, or first thing on line
 		   cannot be Ethernet address, skip the line. */
-		if (!PCAP_ISXDIGIT(c)) {
+		if (!isxdigit(c)) {
 			c = skip_line(fp);
 			if (c == EOF)
 				return (NULL);
@@ -113,7 +110,7 @@ pcap_next_etherent(FILE *fp)
 			c = getc(fp);
 			if (c == EOF)
 				return (NULL);
-			if (PCAP_ISXDIGIT(c)) {
+			if (isxdigit(c)) {
 				d <<= 4;
 				d |= xdtoi((u_char)c);
 				c = getc(fp);
@@ -129,7 +126,7 @@ pcap_next_etherent(FILE *fp)
 		}
 
 		/* Must be whitespace */
-		if (c != ' ' && c != '\t' && c != '\r' && c != '\n') {
+		if (!isspace(c)) {
 			c = skip_line(fp);
 			if (c == EOF)
 				return (NULL);
@@ -159,8 +156,7 @@ pcap_next_etherent(FILE *fp)
 			c = getc(fp);
 			if (c == EOF)
 				return (NULL);
-		} while (c != ' ' && c != '\t' && c != '\r' && c != '\n'
-		    && --namesize != 0);
+		} while (!isspace(c) && --namesize != 0);
 		*bp = '\0';
 
 		/* Eat trailing junk */

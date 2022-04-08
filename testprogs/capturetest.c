@@ -38,9 +38,6 @@ The Regents of the University of California.  All rights reserved.\n";
   #include <unistd.h>
 #endif
 #include <errno.h>
-#ifndef _WIN32
-  #include <signal.h>
-#endif
 #include <sys/types.h>
 
 #include <pcap.h>
@@ -61,37 +58,6 @@ static void warning(const char *, ...) PCAP_PRINTFLIKE(1, 2);
 static char *copy_argv(char **);
 
 static pcap_t *pd;
-#ifndef _WIN32
-static int breaksigint = 0;
-#endif
-
-#ifndef _WIN32
-static void
-sigint_handler(int signum _U_)
-{
-	if (breaksigint)
-		pcap_breakloop(pd);
-}
-#endif
-
-#ifdef _WIN32
-/*
- * We don't have UN*X-style signals, so we don't have anything to test.
- */
-#define B_OPTION	""
-#define R_OPTION	""
-#define S_OPTION	""
-#else
-/*
- * We do have UN*X-style signals (we assume that "not Windows" means "UN*X").
- */
-#define B_OPTION	"b"
-#define R_OPTION	"r"
-#define S_OPTION	"s"
-#endif
-
-#define COMMAND_OPTIONS	B_OPTION "i:mn" R_OPTION S_OPTION "t:"
-#define USAGE_OPTIONS	"-" B_OPTION "mn" R_OPTION S_OPTION
 
 int
 main(int argc, char **argv)
@@ -103,10 +69,6 @@ main(int argc, char **argv)
 	int timeout = 1000;
 	int immediate = 0;
 	int nonblock = 0;
-#ifndef _WIN32
-	int sigrestart = 0;
-	int catchsigint = 0;
-#endif
 	pcap_if_t *devlist;
 	bpf_u_int32 localnet, netmask;
 	struct bpf_program fcode;
@@ -121,14 +83,8 @@ main(int argc, char **argv)
 		program_name = argv[0];
 
 	opterr = 0;
-	while ((op = getopt(argc, argv, COMMAND_OPTIONS)) != -1) {
+	while ((op = getopt(argc, argv, "i:mnt:")) != -1) {
 		switch (op) {
-
-#ifndef _WIN32
-		case 'b':
-			breaksigint = 1;
-			break;
-#endif
 
 		case 'i':
 			device = optarg;
@@ -141,16 +97,6 @@ main(int argc, char **argv)
 		case 'n':
 			nonblock = 1;
 			break;
-
-#ifndef _WIN32
-		case 'r':
-			sigrestart = 1;
-			break;
-
-		case 's':
-			catchsigint = 1;
-			break;
-#endif
 
 		case 't':
 			longarg = strtol(optarg, &p, 10);
@@ -186,28 +132,6 @@ main(int argc, char **argv)
 		pcap_freealldevs(devlist);
 	}
 	*ebuf = '\0';
-
-#ifndef _WIN32
-	/*
-	 * If we were told to catch SIGINT, do so.
-	 */
-	if (catchsigint) {
-		struct sigaction action;
-
-		action.sa_handler = sigint_handler;
-		sigemptyset(&action.sa_mask);
-
-		/*
-		 * Should SIGINT interrupt, or restart, system calls?
-		 */
-		action.sa_flags = sigrestart ? SA_RESTART : 0;
-
-		if (sigaction(SIGINT, &action, NULL) == -1)
-			error("Can't catch SIGINT: %s\n",
-			    strerror(errno));
-	}
-#endif
-
 	pd = pcap_create(device, ebuf);
 	if (pd == NULL)
 		error("%s", ebuf);
@@ -264,10 +188,6 @@ main(int argc, char **argv)
 		if (status != 0) {
 			printf("%d packets seen, %d packets counted after pcap_dispatch returns\n",
 			    status, packet_count);
-			struct pcap_stat ps;
-			pcap_stats(pd, &ps);
-			printf("%d ps_recv, %d ps_drop, %d ps_ifdrop\n",
-			    ps.ps_recv, ps.ps_drop, ps.ps_ifdrop);
 		}
 	}
 	if (status == -2) {
@@ -277,14 +197,13 @@ main(int argc, char **argv)
 		 * Print an extra newline, just in case.
 		 */
 		putchar('\n');
-		printf("Broken out of loop from SIGINT handler\n");
 	}
 	(void)fflush(stdout);
 	if (status == -1) {
 		/*
 		 * Error.  Report it.
 		 */
-		(void)fprintf(stderr, "%s: pcap_dispatch: %s\n",
+		(void)fprintf(stderr, "%s: pcap_loop: %s\n",
 		    program_name, pcap_geterr(pd));
 	}
 	pcap_close(pd);
@@ -304,7 +223,7 @@ countme(u_char *user, const struct pcap_pkthdr *h _U_, const u_char *sp _U_)
 static void
 usage(void)
 {
-	(void)fprintf(stderr, "Usage: %s [ " USAGE_OPTIONS " ] [ -i interface ] [ -t timeout] [expression]\n",
+	(void)fprintf(stderr, "Usage: %s [ -mn ] [ -i interface ] [ -t timeout] [expression]\n",
 	    program_name);
 	exit(1);
 }
@@ -352,7 +271,7 @@ static char *
 copy_argv(register char **argv)
 {
 	register char **p;
-	register size_t len = 0;
+	register u_int len = 0;
 	char *buf;
 	char *src, *dst;
 
