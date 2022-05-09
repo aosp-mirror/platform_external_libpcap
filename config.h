@@ -59,7 +59,9 @@
 /* #undef HAVE_GETSPNAM */
 
 /* Define to 1 if you have a GNU-style `strerror_r' function. */
-#define HAVE_GNU_STRERROR_R /**/
+#ifndef ANDROID_HOST_MUSL
+#define HAVE_GNU_STRERROR_R 1
+#endif
 
 /* on HP-UX 10.20 or later */
 /* #undef HAVE_HPUX10_20_OR_LATER */
