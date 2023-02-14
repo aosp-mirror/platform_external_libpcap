@@ -1,0 +1,80 @@
+# The internal git client reads CIRRUS_CLONE_DEPTH.
+env:
+  CIRRUS_CLONE_DEPTH: 3
+
+freebsd_task:
+  name: freebsd-amd64
+  only_if: $CIRRUS_BRANCH != 'coverity_scan'
+  freebsd_instance:
+    matrix:
+      - image_family: freebsd-11-4
+        cpu: 2
+        memory: 2G
+      - image_family: freebsd-12-2
+        cpu: 2
+        memory: 2G
+      - image_family: freebsd-13-0
+        cpu: 4
+        memory: 4G
+  env:
+    IGNORE_OSVERSION: yes
+    MAKEFLAGS: -j 4
+    MATRIX_CC: clang gcc48 gcc10
+  script:
+    - pkg install -qy autoconf gcc48 gcc10
+    - pkg install -qy bash cmake git # for build_matrix.sh and build.sh
+    - ./build_matrix.sh
+
+linux_task:
+  name: linux-amd64
+  only_if: $CIRRUS_BRANCH != 'coverity_scan'
+  container:
+    image: ubuntu:20.04
+    cpu: 2
+    memory: 1G
+  env:
+    DEBIAN_FRONTEND: noninteractive
+    MAKEFLAGS: -j 3
+  script:
+    - apt-get -qy update
+    - apt-get -qy install libdbus-1-dev libbluetooth-dev libnl-genl-3-dev libibverbs-dev
+    - apt-get -qy install flex bison autoconf make clang gcc
+    - apt-get -qy install cmake git # for build_matrix.sh and build.sh
+    - apt list --installed 'lib*-dev'
+    - ./build_matrix.sh
+
+macos_task:
+  name: macos-amd64
+  only_if: $CIRRUS_BRANCH != 'coverity_scan'
+  macos_instance:
+    image: big-sur-xcode
+  env:
+    MAKEFLAGS: '-j 12' # macOS VMs always run on 12 cores
+  script:
+    - brew update >/dev/null
+    - ./build_matrix.sh
+
+coverity_task:
+  name: Coverity Scan
+  only_if: $CIRRUS_BRANCH == 'coverity_scan'
+  container:
+    image: ubuntu:20.04
+    cpu: 2
+    memory: 2G
+  env:
+    DEBIAN_FRONTEND: noninteractive
+    MAKEFLAGS: -j 3
+    COVERITY_SCAN_PROJECT_NAME: $CIRRUS_REPO_FULL_NAME
+    COVERITY_SCAN_TOKEN: ENCRYPTED[58bfbfcf624e5b7b85fb9df95dd0b3f9f93642824e6ae94616e4d345af4848580932a6ece02337fee112194b29ce6593]
+    COVERITY_SCAN_BUILD_COMMAND_PREPEND: ./configure --enable-remote
+    COVERITY_SCAN_BUILD_COMMAND: make
+    COVERITY_SCAN_BRANCH_PATTERN: $CIRRUS_BRANCH
+    TRAVIS_BRANCH: $CIRRUS_BRANCH
+    TRAVIS_PULL_REQUEST: ${CIRRUS_BASE_BRANCH:+true}
+  script:
+    - apt-get -qy update
+    - apt-get -qy install libdbus-1-dev libbluetooth-dev libnl-genl-3-dev libibverbs-dev
+    - apt-get -qy install flex bison autoconf make gcc
+    - apt-get -qy install git curl wget ruby rubygems ruby-json # for the coverity script
+    - apt list --installed 'lib*-dev'
+    - ./.travis-coverity-scan-build.sh
