@@ -1,3 +1,7 @@
+# This project was upgraded with external_updater.
+# Usage: tools/external_updater/updater.sh update libpcap
+# For more info, check https://cs.android.com/android/platform/superproject/+/master:tools/external_updater/README.md
+
 name: "libpcap"
 description: "A system-independent interface for user-level packet capture."
 third_party {
@@ -9,7 +13,7 @@ third_party {
     type: GIT
     value: "https://github.com/the-tcpdump-group/libpcap.git"
   }
-  version: "libpcap-1.10.1"
+  version: "libpcap-1.10.3"
   license_type: NOTICE
   security {
     tag: "NVD-CPE2.3:cpe:/a:tcpdump:libpcap:-"
