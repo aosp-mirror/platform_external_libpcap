@@ -1,71 +1,63 @@
-#!/usr/bin/env bash
+#!/bin/sh -e
 
 # This script executes the matrix loops, exclude tests and cleaning.
-# The matrix can be configured with environment variables MATRIX_CC,
-# MATRIX_CMAKE and MATRIX_REMOTE (default: MATRIX_CC='gcc clang',
-# MATRIX_CMAKE='no yes', MATRIX_REMOTE='no yes').
+# The matrix can be configured with the following environment variables: MATRIX_CC,
+# MATRIX_CMAKE and MATRIX_REMOTE.
+: "${MATRIX_CC:=gcc clang}"
+: "${MATRIX_CMAKE:=no yes}"
+: "${MATRIX_REMOTE:=no yes}"
+# Set this variable to "yes" before calling this script to disregard all
+# warnings in a particular environment (CI or a local working copy).  Set it
+# to "yes" in this script or in build.sh when a matrix subset is known to be
+# not warning-free because of the OS, the compiler or whatever other factor
+# that the scripts can detect both in and out of CI.
+: "${LIBPCAP_TAINTED:=no}"
+# Some OSes have native make without parallel jobs support and sometimes have
+# GNU Make available as "gmake".
+: "${MAKE_BIN:=make}"
 # It calls the build.sh script which runs one build with setup environment
-# variables : CC, CMAKE and REMOTE (default: CC=gcc, CMAKE=no, REMOTE=no).
+# variables: CC, CMAKE and REMOTE.
 
-set -e
-
-# ANSI color escape sequences
-ANSI_MAGENTA="\\033[35;1m"
-ANSI_RESET="\\033[0m"
-uname -a
-date
+. ./build_common.sh
+print_sysinfo
 # Install directory prefix
 if [ -z "$PREFIX" ]; then
-    PREFIX=$(mktemp -d -t libpcap_build_matrix_XXXXXXXX)
+    PREFIX=`mktempdir libpcap_build_matrix`
     echo "PREFIX set to '$PREFIX'"
     export PREFIX
 fi
 COUNT=0
-
-travis_fold() {
-    local action=${1:?}
-    local name=${2:?}
-    if [ "$TRAVIS" != true ]; then return; fi
-    echo -ne "travis_fold:$action:$LABEL.script.$name\\r"
-    sleep 1
-}
-
-# Display text in magenta
-echo_magenta() {
-    echo -ne "$ANSI_MAGENTA"
-    echo "$@"
-    echo -ne "$ANSI_RESET"
-}
+export LIBPCAP_TAINTED
+if command -v valgrind >/dev/null 2>&1; then
+    VALGRIND_CMD="valgrind --leak-check=full --error-exitcode=1"
+    export VALGRIND_CMD
+fi
 
 touch .devel configure
-for CC in ${MATRIX_CC:-gcc clang}; do
+for CC in $MATRIX_CC; do
     export CC
-    # Exclude gcc on macOS (it is just an alias for clang).
-    if [ "$CC" = gcc ] && [ "$(uname -s)" = Darwin ]; then
+    discard_cc_cache
+    if gcc_is_clang_in_disguise; then
         echo '(skipped)'
         continue
     fi
-    for CMAKE in ${MATRIX_CMAKE:-no yes}; do
+    for CMAKE in $MATRIX_CMAKE; do
         export CMAKE
-        for REMOTE in ${MATRIX_REMOTE:-no yes}; do
+        for REMOTE in $MATRIX_REMOTE; do
             export REMOTE
-            COUNT=$((COUNT+1))
-            echo_magenta "===== SETUP $COUNT: CC=$CC CMAKE=$CMAKE REMOTE=$REMOTE ====="
-            # LABEL is needed to build the travis fold labels
-            LABEL="$CC.$CMAKE.$REMOTE"
+            COUNT=`increment $COUNT`
+            echo_magenta "===== SETUP $COUNT: CC=$CC CMAKE=$CMAKE REMOTE=$REMOTE =====" >&2
             # Run one build with setup environment variables: CC, CMAKE and REMOTE
-            ./build.sh
+            run_after_echo ./build.sh
             echo 'Cleaning...'
-            travis_fold start cleaning
-            if [ "$CMAKE" = yes ]; then rm -rf build; else make distclean; fi
-            rm -rf "${PREFIX:?}"/*
-            git status -suall
+            if [ "$CMAKE" = yes ]; then rm -rf build; else "$MAKE_BIN" distclean; fi
+            purge_directory "$PREFIX"
+            run_after_echo git status -suall
             # Cancel changes in configure
-            git checkout configure
-            travis_fold end cleaning
+            run_after_echo git checkout configure
         done
     done
 done
-rm -rf "$PREFIX"
-echo_magenta "Tested setup count: $COUNT"
+run_after_echo rm -rf "$PREFIX"
+echo_magenta "Tested setup count: $COUNT" >&2
 # vi: set tabstop=4 softtabstop=0 expandtab shiftwidth=4 smarttab autoindent :
