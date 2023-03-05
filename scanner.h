@@ -28,9 +28,16 @@
  */
 #include <pcap/pcap-inttypes.h>
 
+/*
+ * grammar.h requires gencode.h and sometimes breaks in a polluted namespace
+ * (see ftmacros.h), so include it early.
+ */
+#include "gencode.h"
+#include "grammar.h"
+
 #include "diag-control.h"
 
-#line 34 "scanner.h"
+#line 41 "scanner.h"
 
 #define  YY_INT_ALIGNED short int
 
@@ -736,9 +743,9 @@ extern int yylex \
 #undef yyTABLES_NAME
 #endif
 
-#line 479 "scanner.l"
+#line 486 "scanner.l"
 
 
-#line 743 "scanner.h"
+#line 750 "scanner.h"
 #undef pcap_IN_HEADER
 #endif /* pcap_HEADER_H */
