@@ -19,6 +19,9 @@
 /* Define to 1 if you have the `asprintf' function. */
 #define HAVE_ASPRINTF 1
 
+/* Define to 1 if you have the <config/HaikuConfig.h> header file. */
+/* #undef HAVE_CONFIG_HAIKUCONFIG_H */
+
 /* Define to 1 if you have the <dagapi.h> header file. */
 /* #undef HAVE_DAGAPI_H */
 
@@ -72,8 +75,8 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
 
-/* Define to 1 if you have the `dag' library (-ldag). */
-/* #undef HAVE_LIBDAG */
+/* Define to 1 if you have the `bsd' library (-lbsd). */
+/* #undef HAVE_LIBBSD */
 
 /* if libdlpi exists */
 /* #undef HAVE_LIBDLPI */
@@ -81,26 +84,8 @@
 /* if libnl exists */
 /* #undef HAVE_LIBNL */
 
-/* if libnl exists and is version 2.x */
-/* #undef HAVE_LIBNL_2_x */
-
-/* if libnl exists and is version 3.x */
-/* #undef HAVE_LIBNL_3_x */
-
-/* libnl has NLE_FAILURE */
-/* #undef HAVE_LIBNL_NLE */
-
-/* libnl has new-style socket api */
-/* #undef HAVE_LIBNL_SOCKETS */
-
-/* Define to 1 if you have the <limits.h> header file. */
-#define HAVE_LIMITS_H 1
-
 /* Define to 1 if you have the <linux/compiler.h> header file. */
 /* #undef HAVE_LINUX_COMPILER_H */
-
-/* Define to 1 if you have the <linux/ethtool.h> header file. */
-#define HAVE_LINUX_ETHTOOL_H 1
 
 /* define if we have the Linux getnetbyname_r() */
 /* #undef HAVE_LINUX_GETNETBYNAME_R */
@@ -108,17 +93,11 @@
 /* define if we have the Linux getprotobyname_r() */
 /* #undef HAVE_LINUX_GETPROTOBYNAME_R */
 
-/* Define to 1 if you have the <linux/if_bonding.h> header file. */
-#define HAVE_LINUX_IF_BONDING_H 1
-
 /* Define to 1 if you have the <linux/net_tstamp.h> header file. */
 #define HAVE_LINUX_NET_TSTAMP_H 1
 
 /* Define to 1 if you have the <linux/socket.h> header file. */
 #define HAVE_LINUX_SOCKET_H 1
-
-/* Define to 1 if you have the <linux/sockios.h> header file. */
-#define HAVE_LINUX_SOCKIOS_H 1
 
 /* Define to 1 if you have the <linux/usbdevice_fs.h> header file. */
 #define HAVE_LINUX_USBDEVICE_FS_H 1
@@ -138,8 +117,17 @@
 /* Define to 1 if you have the <net/enet.h> header file. */
 /* #undef HAVE_NET_ENET_H */
 
+/* Define to 1 if you have the <net/if_dl.h> header file. */
+/* #undef HAVE_NET_IF_DL_H */
+
+/* Define to 1 if you have the <net/if.h> header file. */
+/* #undef HAVE_NET_IF_H */
+
 /* Define to 1 if you have the <net/if_media.h> header file. */
 /* #undef HAVE_NET_IF_MEDIA_H */
+
+/* Define to 1 if you have the <net/if_types.h> header file. */
+/* #undef HAVE_NET_IF_TYPES_H */
 
 /* Define to 1 if you have the <net/nit.h> header file. */
 /* #undef HAVE_NET_NIT_H */
@@ -147,17 +135,14 @@
 /* Define to 1 if you have the <net/pfilt.h> header file. */
 /* #undef HAVE_NET_PFILT_H */
 
-/* Define to 1 if you have the <net/pfvar.h> header file. */
-/* #undef HAVE_NET_PFVAR_H */
-
 /* Define to 1 if you have the <net/raw.h> header file. */
 /* #undef HAVE_NET_RAW_H */
 
+/* Use OpenSSL */
+/* #undef HAVE_OPENSSL */
+
 /* if there's an os_proto.h for this platform, to use additional prototypes */
 /* #undef HAVE_OS_PROTO_H */
-
-/* define if net/pfvar.h defines PF_NAT through PF_NORDR */
-/* #undef HAVE_PF_NAT_THROUGH_PF_NORDR */
 
 /* Define to 1 if you have a POSIX-style `strerror_r' function. */
 #define HAVE_POSIX_STRERROR_R 1
@@ -167,9 +152,6 @@
 
 /* define if you have the Myricom SNF API */
 /* #undef HAVE_SNF_API */
-
-/* Define to 1 if you have the `snprintf' function. */
-#define HAVE_SNPRINTF 1
 
 /* Define to 1 if the system has the type `socklen_t'. */
 #define HAVE_SOCKLEN_T 1
@@ -191,9 +173,6 @@
 
 /* Define to 1 if you have the `strerror' function. */
 #define HAVE_STRERROR 1
-
-/* Define to 1 if you have the `strerror_s' function. */
-/* #undef HAVE_STRERROR_S */
 
 /* Define to 1 if you have the <strings.h> header file. */
 #define HAVE_STRINGS_H 1
@@ -226,6 +205,9 @@
 /* Define to 1 if `msg_flags' is a member of `struct msghdr'. */
 /* #undef HAVE_STRUCT_MSGHDR_MSG_FLAGS */
 
+/* Define to 1 if the system has the type `struct rte_ether_addr'. */
+/* #undef HAVE_STRUCT_RTE_ETHER_ADDR */
+
 /* Define to 1 if `hci_channel' is a member of `struct sockaddr_hci'. */
 /* #undef HAVE_STRUCT_SOCKADDR_HCI_HCI_CHANNEL */
 
@@ -237,9 +219,6 @@
 
 /* Define to 1 if `tp_vlan_tci' is a member of `struct tpacket_auxdata'. */
 #define HAVE_STRUCT_TPACKET_AUXDATA_TP_VLAN_TCI 1
-
-/* Define to 1 if the system has the type `struct tpacket_stats'. */
-#define HAVE_STRUCT_TPACKET_STATS 1
 
 /* Define to 1 if `bRequestType' is a member of `struct
    usbdevfs_ctrltransfer'. */
@@ -278,20 +257,20 @@
 /* Define to 1 if you have the `vasprintf' function. */
 #define HAVE_VASPRINTF 1
 
-/* Define to 1 if you have the `vsnprintf' function. */
-#define HAVE_VSNPRINTF 1
-
 /* Define to 1 if you have the `vsyslog' function. */
 #define HAVE_VSYSLOG 1
 
+/* Define to 1 if you have the `_wcserror_s' function. */
+/* #undef HAVE__WCSERROR_S */
+
+/* define if __atomic_load_n is supported by the compiler */
+#define HAVE___ATOMIC_LOAD_N 1
+
+/* define if __atomic_store_n is supported by the compiler */
+#define HAVE___ATOMIC_STORE_N 1
+
 /* IPv6 */
 #define INET6 1
-
-/* if unaligned access fails */
-/* #undef LBL_ALIGN */
-
-/* path for device for USB sniffing */
-#define LINUX_USB_MON_DEV "/dev/usbmon"
 
 /* Define to 1 if netinet/ether.h declares `ether_hostton' */
 #define NETINET_ETHER_H_DECLARES_ETHER_HOSTTON /**/
@@ -312,7 +291,7 @@
 #define PACKAGE_NAME "pcap"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "pcap 1.9.1"
+#define PACKAGE_STRING "pcap 1.10.3"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "pcap"
@@ -321,7 +300,7 @@
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "1.9.1"
+#define PACKAGE_VERSION "1.10.3"
 
 /* target host supports Bluetooth sniffing */
 /* #undef PCAP_SUPPORT_BT */
@@ -338,17 +317,11 @@
 /* target host supports netmap */
 /* #undef PCAP_SUPPORT_NETMAP */
 
-/* use packet ring capture support on Linux if available */
-#define PCAP_SUPPORT_PACKET_RING 1
-
 /* target host supports RDMA sniffing */
 /* #undef PCAP_SUPPORT_RDMASNIFF */
 
-/* target host supports USB sniffing */
-#define PCAP_SUPPORT_USB 1
-
-/* include ACN support */
-/* #undef SITA */
+/* The size of `const void *', as computed by sizeof. */
+/* #undef SIZEOF_CONST_VOID_P */
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
