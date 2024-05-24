@@ -311,6 +311,9 @@
 /* support D-Bus sniffing */
 /* #undef PCAP_SUPPORT_DBUS */
 
+/* target host supports Linux usbmon for USB sniffing */
+#define PCAP_SUPPORT_LINUX_USBMON 1
+
 /* target host supports netfilter sniffing */
 #define PCAP_SUPPORT_NETFILTER 1
 
