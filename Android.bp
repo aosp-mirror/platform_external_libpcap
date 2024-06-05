@@ -86,25 +86,80 @@ cc_library {
 }
 
 //
-// Tests.
+// Tests (but not _unit_ tests).
+//
+// It's unlikely anyone's running these manually, but at least compiling them
+// shows we can compile libpcap callers...
 //
 
 cc_test {
-    name: "libpcap_test",
+    name: "libpcap_can_set_rfmon_test",
     defaults: ["libpcap_defaults"],
     gtest: false,
-    // (Matches order in libpcap's Makefile.)
-    srcs: [
-        "testprogs/can_set_rfmon_test.c",
-        "testprogs/capturetest.c",
-        "testprogs/filtertest.c",
-        "testprogs/findalldevstest.c",
-        "testprogs/opentest.c",
-        "testprogs/reactivatetest.c",
-        "testprogs/selpolltest.c",
-        "testprogs/threadsignaltest.c",
-        "testprogs/valgrindtest.c",
-    ],
+    srcs: ["testprogs/can_set_rfmon_test.c"],
     static_libs: ["libpcap"],
-    test_per_src: true,
+}
+
+cc_test {
+    name: "libpcap_capture_test",
+    defaults: ["libpcap_defaults"],
+    gtest: false,
+    srcs: ["testprogs/capturetest.c"],
+    static_libs: ["libpcap"],
+}
+
+cc_test {
+    name: "libpcap_filter_test",
+    defaults: ["libpcap_defaults"],
+    gtest: false,
+    srcs: ["testprogs/filtertest.c"],
+    static_libs: ["libpcap"],
+}
+
+cc_test {
+    name: "libpcap_findalldevs_test",
+    defaults: ["libpcap_defaults"],
+    gtest: false,
+    srcs: ["testprogs/findalldevstest.c"],
+    static_libs: ["libpcap"],
+}
+
+cc_test {
+    name: "libpcap_open_test",
+    defaults: ["libpcap_defaults"],
+    gtest: false,
+    srcs: ["testprogs/opentest.c"],
+    static_libs: ["libpcap"],
+}
+
+cc_test {
+    name: "libpcap_reactivate_test",
+    defaults: ["libpcap_defaults"],
+    gtest: false,
+    srcs: ["testprogs/reactivatetest.c"],
+    static_libs: ["libpcap"],
+}
+
+cc_test {
+    name: "libpcap_selpoll_test",
+    defaults: ["libpcap_defaults"],
+    gtest: false,
+    srcs: ["testprogs/selpolltest.c"],
+    static_libs: ["libpcap"],
+}
+
+cc_test {
+    name: "libpcap_threadsignal_test",
+    defaults: ["libpcap_defaults"],
+    gtest: false,
+    srcs: ["testprogs/threadsignaltest.c"],
+    static_libs: ["libpcap"],
+}
+
+cc_test {
+    name: "libpcap_valgrind_test",
+    defaults: ["libpcap_defaults"],
+    gtest: false,
+    srcs: ["testprogs/valgrindtest.c"],
+    static_libs: ["libpcap"],
 }

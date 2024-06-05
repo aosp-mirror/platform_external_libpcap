@@ -291,7 +291,7 @@
 #define PACKAGE_NAME "pcap"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "pcap 1.10.3"
+#define PACKAGE_STRING "pcap 1.10.4"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "pcap"
@@ -300,7 +300,7 @@
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "1.10.3"
+#define PACKAGE_VERSION "1.10.4"
 
 /* target host supports Bluetooth sniffing */
 /* #undef PCAP_SUPPORT_BT */
@@ -310,6 +310,9 @@
 
 /* support D-Bus sniffing */
 /* #undef PCAP_SUPPORT_DBUS */
+
+/* target host supports Linux usbmon for USB sniffing */
+#define PCAP_SUPPORT_LINUX_USBMON 1
 
 /* target host supports netfilter sniffing */
 #define PCAP_SUPPORT_NETFILTER 1
