@@ -61,7 +61,6 @@ cc_library {
         "pcap-common.c",
         "pcap-linux.c",
         "pcap-netfilter-linux-android.c",
-        "pcap-usb-linux-common.c",
         "pcap-usb-linux.c",
         "pcap-util.c",
         "pcap.c",
