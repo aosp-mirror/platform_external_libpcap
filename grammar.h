@@ -183,7 +183,7 @@ extern int pcap_debug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 349 "grammar.y"
+#line 357 "grammar.y"
 
 	int i;
 	bpf_u_int32 h;
